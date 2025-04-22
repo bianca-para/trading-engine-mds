@@ -1,10 +1,10 @@
-package com.project.tradingengine;
+package org.dev.server;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class TradingEngineApplicationTests {
+class ServerApplicationTests {
 
     @Test
     void contextLoads() {
