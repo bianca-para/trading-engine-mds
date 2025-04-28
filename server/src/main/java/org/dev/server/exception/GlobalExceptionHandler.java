@@ -39,4 +39,45 @@ public class GlobalExceptionHandler {
         errors.put("message", "Username already exists.");
         return ResponseEntity.badRequest().body(errors);
     }
+
+    //asset existent
+    @ExceptionHandler(AssetAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleAssetAlreadyExistsException(AssetAlreadyExistsException ex){
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", ex.getMessage());
+        return ResponseEntity.badRequest().body(errors);
+    }
+
+    //asset inexistent
+    @ExceptionHandler(AssetNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleAssetNotFoundException(AssetNotFoundException ex){
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", ex.getMessage());
+        return ResponseEntity.badRequest().body(errors);
+    }
+
+    //jdbc errors
+    @ExceptionHandler(JdbcException.class)
+    public ResponseEntity<Map<String, String>> handleJdbcException(JdbcException ex){
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", ex.getMessage());
+
+        return ResponseEntity.badRequest().body(errors);
+    }
+    //else exception for jdbc possible thrown exceptions
+    @ExceptionHandler(DatabaseException.class)
+    public ResponseEntity<Map<String, String>> handleDatabaseException(DatabaseException ex){
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", ex.getMessage());
+
+        return ResponseEntity.internalServerError().body(errors);
+    }
+
+    @ExceptionHandler(InsufficientQuantityException.class)
+    public ResponseEntity<Map<String, String>> handleInsufficientQuantityException(InsufficientQuantityException ex){
+        Map<String, String> errors = new HashMap<>();
+        errors.put("message", ex.getMessage());
+
+        return ResponseEntity.badRequest().body(errors);
+    }
 }

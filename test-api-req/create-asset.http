@@ -1,0 +1,8 @@
+POST localhost:8080/asset
+Content-Type: application/json
+
+{
+  "symbol": "BTC",
+  "name": "bitcoin",
+  "price": 20.00
+}
