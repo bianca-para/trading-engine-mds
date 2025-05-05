@@ -130,43 +130,43 @@ class matchingEngine:
         return trades
 
 
-# # Run sample test
-# engine = matchingEngine()
-#
-# orders = [
-#     order(id=1, traderId="T1", symbol="TSLA", price=100, quantity=10, side="BUY", timestamp=1),
-#     order(id=2, traderId="T2", symbol="TSLA", price=101, quantity=5, side="BUY", timestamp=2),
-#     order(id=3, traderId="T3", symbol="TSLA", price=99, quantity=7, side="SELL", timestamp=3),
-#     order(id=4, traderId="T4", symbol="TSLA", price=100, quantity=4, side="SELL", timestamp=4),
-#     order(id=5, traderId="T5", symbol="TSLA", price=102, quantity=8, side="BUY", timestamp=5),
-#     order(id=6, traderId="T6", symbol="TSLA", price=98, quantity=6, side="SELL", timestamp=6),
-#     order(id=7, traderId="T7", symbol="TSLA", price=101, quantity=3, side="SELL", timestamp=7),
-#     order(id=8, traderId="T8", symbol="TSLA", price=102, quantity=2, side="SELL", timestamp=8),
-#     order(id=9, traderId="T9", symbol="TSLA", price=99, quantity=10, side="BUY", timestamp=9),
-#     order(id=10, traderId="T10", symbol="TSLA", price=100, quantity=6, side="SELL", timestamp=10),
-#     order(id=11, traderId="T11", symbol="TSLA", price=98, quantity=4, side="BUY", timestamp=11),
-#     order(id=12, traderId="T12", symbol="TSLA", price=97, quantity=8, side="SELL", timestamp=12),
-#     order(id=13, traderId="T13", symbol="TSLA", price=96, quantity=7, side="SELL", timestamp=13),
-#     order(id=14, traderId="T14", symbol="TSLA", price=97, quantity=2, side="BUY", timestamp=14),
-#     order(id=15, traderId="T15", symbol="TSLA", price=103, quantity=5, side="BUY", timestamp=15),
-#     order(id=16, traderId="T16", symbol="TSLA", price=101, quantity=6, side="SELL", timestamp=16),
-#     order(id=17, traderId="T17", symbol="TSLA", price=100, quantity=10, side="BUY", timestamp=17),
-#     order(id=18, traderId="T18", symbol="TSLA", price=104, quantity=2, side="BUY", timestamp=18),
-#     order(id=19, traderId="T19", symbol="TSLA", price=102, quantity=6, side="SELL", timestamp=19),
-#     order(id=20, traderId="T20", symbol="TSLA", price=101, quantity=4, side="SELL", timestamp=20),
-# ]
-#
-# for o in orders:
-#     trades = engine.receiveOrder(o)
-#     print(f"Trades after Order {o.id}:", trades)
-#
-# book = engine.orderBooks["TSLA"]
-#
-# print("\nFinal OrderBook BIDS:")
-# for price in book.bidList:
-#     actual_price = -price
-#     print(f"Price {actual_price}: {[str(o) for o in book.bidLevels[actual_price].orders]}")
-#
-# print("\nFinal OrderBook ASKS:")
-# for price in book.askList:
-#     print(f"Price {price}: {[str(o) for o in book.askLevels[price].orders]}")
+# Run sample test
+engine = matchingEngine()
+
+orders = [
+    order(id=1, traderId="T1", symbol="TSLA", price=100, quantity=10, side="BUY", timestamp=1),
+    order(id=2, traderId="T2", symbol="TSLA", price=101, quantity=5, side="BUY", timestamp=2),
+    order(id=3, traderId="T3", symbol="TSLA", price=99, quantity=7, side="SELL", timestamp=3),
+    order(id=4, traderId="T4", symbol="TSLA", price=100, quantity=4, side="SELL", timestamp=4),
+    order(id=5, traderId="T5", symbol="TSLA", price=102, quantity=8, side="BUY", timestamp=5),
+    order(id=6, traderId="T6", symbol="TSLA", price=98, quantity=6, side="SELL", timestamp=6),
+    order(id=7, traderId="T7", symbol="TSLA", price=101, quantity=3, side="SELL", timestamp=7),
+    order(id=8, traderId="T8", symbol="TSLA", price=102, quantity=2, side="SELL", timestamp=8),
+    order(id=9, traderId="T9", symbol="TSLA", price=99, quantity=10, side="BUY", timestamp=9),
+    order(id=10, traderId="T10", symbol="TSLA", price=100, quantity=6, side="SELL", timestamp=10),
+    order(id=11, traderId="T11", symbol="TSLA", price=98, quantity=4, side="BUY", timestamp=11),
+    order(id=12, traderId="T12", symbol="TSLA", price=97, quantity=8, side="SELL", timestamp=12),
+    order(id=13, traderId="T13", symbol="TSLA", price=96, quantity=7, side="SELL", timestamp=13),
+    order(id=14, traderId="T14", symbol="TSLA", price=97, quantity=2, side="BUY", timestamp=14),
+    order(id=15, traderId="T15", symbol="TSLA", price=103, quantity=5, side="BUY", timestamp=15),
+    order(id=16, traderId="T16", symbol="TSLA", price=101, quantity=6, side="SELL", timestamp=16),
+    order(id=17, traderId="T17", symbol="TSLA", price=100, quantity=10, side="BUY", timestamp=17),
+    order(id=18, traderId="T18", symbol="TSLA", price=104, quantity=2, side="BUY", timestamp=18),
+    order(id=19, traderId="T19", symbol="TSLA", price=102, quantity=6, side="SELL", timestamp=19),
+    order(id=20, traderId="T20", symbol="TSLA", price=101, quantity=4, side="SELL", timestamp=20),
+]
+
+for o in orders:
+    trades = engine.receiveOrder(o)
+    print(f"Trades after Order {o.id}:", trades)
+
+book = engine.orderBooks["TSLA"]
+
+print("\nFinal OrderBook BIDS:")
+for price in book.bidList:
+    actual_price = -price
+    print(f"Price {actual_price}: {[str(o) for o in book.bidLevels[actual_price].orders]}")
+
+print("\nFinal OrderBook ASKS:")
+for price in book.askList:
+    print(f"Price {price}: {[str(o) for o in book.askLevels[price].orders]}")
