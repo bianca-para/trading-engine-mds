@@ -1,1 +1,12 @@
-GET localhost:8080/user-asset/quantity?userId=123e4567-e89b-12d3-a456-426614174000&assetId=2
+POST http://127.0.0.1:8000/order
+Content-Type: application/json
+
+{
+  "id": 3,
+  "traderId": "4",
+  "symbol": "btc",
+  "price": 3.00,
+  "quantity": 4,
+  "side": "BUY",
+  "timestamp": 20
+}
