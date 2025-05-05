@@ -59,6 +59,20 @@
             <artifactId>jakarta.persistence-api</artifactId>
             <version>3.1.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-core -->
+<!--        used for seeding DDL and DML-->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>11.7.0</version>
+
+
+        </dependency>
+<!--        used for linking flyway and postrgesql-->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+        </dependency>
         <!--        <dependency>-->
         <!--            <groupId>jakarta.validation</groupId>-->
         <!--            <artifactId>jakarta.validation-api</artifactId>-->
