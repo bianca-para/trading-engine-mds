@@ -13,4 +13,4 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 app:
   secret:
-    key: J@!gt*K
+    key: J@!gt*Kbut
