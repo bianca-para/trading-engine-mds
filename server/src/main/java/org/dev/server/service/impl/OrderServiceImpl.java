@@ -12,9 +12,13 @@ import org.dev.server.repository.AssetRepository;
 import org.dev.server.repository.OrderRepository;
 import org.dev.server.repository.UserRepository;
 import org.dev.server.service.OrderService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -23,16 +27,33 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final AssetRepository assetRepository;
+    @Autowired
+    private final RestTemplate restTemplate;
 
     public OrderResponseDto createOrder(OrderRequestDto orderRequestDto) {
         User user = userRepository.findById(orderRequestDto.userId())
                 .orElseThrow(() -> new IllegalArgumentException("User with id " + orderRequestDto.userId() + " not found."));
+
 
         Asset asset = assetRepository.findById(orderRequestDto.assetId())
                 .orElseThrow(() -> new IllegalArgumentException("Asset with id " + orderRequestDto.assetId() + " not found."));
 
         Order order = OrderMapper.toEntity(orderRequestDto, user, asset);
         Order savedOrder = orderRepository.save(order);
+
+        // sa trimit spre python
+        Map<String, Object> body = new HashMap<>();
+        body.put("id", savedOrder.getOrderId());
+        body.put("traderId", savedOrder.getUser().getId().toString());
+        body.put("symbol", savedOrder.getAsset().getSymbol());
+        body.put("price", savedOrder.getPrice());
+        body.put("quantity", savedOrder.getQuantity());
+        body.put("side", savedOrder.getType().toString());
+        body.put("timestamp", savedOrder.getCreatedAt());
+
+        String url = "http://127.0.0.1:8000/order";
+        System.out.println("Sending to Python: " + body);
+        restTemplate.postForObject(url, body, String.class);
 
         return OrderMapper.toDto(savedOrder);
     }
