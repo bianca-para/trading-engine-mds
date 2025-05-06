@@ -84,8 +84,13 @@ class matchingEngine:
                 bestBidPrice = -book.bidList[0]
                 if order.price <= bestBidPrice:
                     level = book.bidLevels[bestBidPrice]
-                    while order.quantity > 0 and not level.isEmpty():
+                    matched_any = False
+                    for i in range(len(level.orders)):
                         bestBidOrder = level.seeFirstOrder()
+                        if bestBidOrder.traderId == order.traderId:
+                            level.removeOrder()
+                            level.addOrder(bestBidOrder)  # rotire in coada
+                            continue
                         tradeQuantity = min(bestBidOrder.quantity, order.quantity)
                         trades.append({
                             'buyer': bestBidOrder.traderId,
@@ -97,10 +102,15 @@ class matchingEngine:
                         })
                         order.quantity -= tradeQuantity
                         bestBidOrder.quantity -= tradeQuantity
+                        matched_any = True
                         if bestBidOrder.quantity == 0:
                             level.removeOrder()
+                        else:
+                            break  # nu mai putem face trade
                     if level.isEmpty():
                         book.removeLevel(bestBidPrice, 'BUY')
+                    if not matched_any:
+                        break  # doar comenzi proprii, nu are sens sa continuam
                 else:
                     break
         else:  # BUY order
@@ -108,8 +118,13 @@ class matchingEngine:
                 bestAskPrice = book.askList[0]
                 if order.price >= bestAskPrice:
                     level = book.askLevels[bestAskPrice]
-                    while order.quantity > 0 and not level.isEmpty():
+                    matched_any = False
+                    for i in range(len(level.orders)):
                         bestAskOrder = level.seeFirstOrder()
+                        if bestAskOrder.traderId == order.traderId:
+                            level.removeOrder()
+                            level.addOrder(bestAskOrder)
+                            continue
                         tradeQuantity = min(bestAskOrder.quantity, order.quantity)
                         trades.append({
                             'buyer': order.traderId,
@@ -121,10 +136,15 @@ class matchingEngine:
                         })
                         order.quantity -= tradeQuantity
                         bestAskOrder.quantity -= tradeQuantity
+                        matched_any = True
                         if bestAskOrder.quantity == 0:
                             level.removeOrder()
+                        else:
+                            break
                     if level.isEmpty():
                         book.removeLevel(bestAskPrice, 'SELL')
+                    if not matched_any:
+                        break
                 else:
                     break
         return trades
