@@ -1,0 +1,15 @@
+#spring:
+#  flyway:
+#    enabled: false
+#  datasource:
+#    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;INIT=SET REFERENTIAL_INTEGRITY TRUE
+#    driver-class-name: org.h2.Driver
+#    username: test
+#    password: test
+#  jpa:
+#    hibernate:
+#      ddl-auto: none
+#    show-sql: true
+#    properties:
+#      hibernate:
+#        format_sql: true

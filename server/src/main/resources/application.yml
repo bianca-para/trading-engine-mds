@@ -13,7 +13,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
     enabled: true
-    locations: classpath:db/migration
+    locations: classpath:db/migration/postgres
 app:
   secret:
     key: J@!gt*Kbut
