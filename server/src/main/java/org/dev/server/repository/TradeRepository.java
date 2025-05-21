@@ -24,4 +24,6 @@ public interface TradeRepository extends JpaRepository<Trade, UUID> {
 
     //trade urile peste un anumit pret
     List<Trade> findByPriceGreaterThan(BigDecimal minPrice);
+
+    boolean existsByBuyOrder_OrderIdAndSellOrder_OrderId(Long buyOrderId, Long sellOrderId);
 }
