@@ -13,3 +13,14 @@
 #    properties:
 #      hibernate:
 #        format_sql: true
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+    clean-disabled: false
+    locations: classpath:db/migration/postgres/ddl
