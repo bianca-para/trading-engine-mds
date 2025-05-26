@@ -6,14 +6,17 @@ import org.dev.server.config.SecurityDisabledConfig;
 import org.dev.server.controller.AssetController;
 import org.dev.server.dto.asset.AssetRequestDto;
 import org.dev.server.dto.asset.AssetResponseDto;
+import org.dev.server.jwtconfig.JWTUtil;
 import org.dev.server.model.Asset;
 import org.dev.server.service.AssetService;
+import org.dev.server.service.TradeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -36,6 +39,13 @@ public class AssetControllerTest {
 
     @MockitoBean
     private AssetService assetService;
+
+
+    @MockitoBean
+    private UserDetailsService userDetailsService;
+
+    @MockitoBean
+    private JWTUtil jwtUtil;
 
     @Autowired
     private ObjectMapper objectMapper;

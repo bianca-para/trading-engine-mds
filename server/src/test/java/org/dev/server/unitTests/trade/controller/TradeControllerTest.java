@@ -5,6 +5,7 @@ import org.dev.server.config.SecurityDisabledConfig;
 import org.dev.server.controller.TradeController;
 import org.dev.server.dto.trade.TradeRequestDto;
 import org.dev.server.dto.trade.TradeResponseDto;
+import org.dev.server.jwtconfig.JWTUtil;
 import org.dev.server.service.TradeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,9 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.shaded.com.trilead.ssh2.auth.AuthenticationManager;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -35,6 +39,14 @@ public class TradeControllerTest {
     @MockitoBean
     private TradeService service;
 
+    @MockitoBean
+    private UserDetailsService userDetailsService;
+
+    @MockitoBean
+    private JWTUtil jwtUtil;
+
+    @MockitoBean
+    private AuthenticationManager authenticationManager;
     @Autowired
     private ObjectMapper mapper;
 

@@ -1,6 +1,6 @@
 CREATE TABLE orders
 (
-    order_id   SERIAL PRIMARY KEY,
+    order_id   BIGSERIAL PRIMARY KEY,
     user_id    UUID           NOT NULL,
     asset_id   BIGINT         NOT NULL,
     price      NUMERIC(19, 2) NOT NULL CHECK (price > 0),

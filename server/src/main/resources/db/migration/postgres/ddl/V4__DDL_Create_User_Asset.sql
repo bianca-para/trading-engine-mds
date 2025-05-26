@@ -1,6 +1,6 @@
 CREATE TABLE user_asset
 (
-    user_asset_id SERIAL PRIMARY KEY,
+    user_asset_id BIGSERIAL PRIMARY KEY,
     user_id       UUID    NOT NULL,
     asset_id      BIGINT  NOT NULL,
     quantity      NUMERIC NOT NULL DEFAULT 0,

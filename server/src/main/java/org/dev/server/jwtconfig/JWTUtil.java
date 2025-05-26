@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.Base64;
@@ -12,6 +13,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Component
+@Profile("!test")
 public class JWTUtil {
 
     @Value("${app.secret.key}")
