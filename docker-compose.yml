@@ -1,5 +1,7 @@
+version: '3.8'
+
 services:
-  #db
+  # db
   postgre_db:
     container_name: postgredb
     image: postgres:15
@@ -9,17 +11,26 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: TradingEngineDB
-  #server
+
+  # spring server
   spring_app:
     build:
       context: server
-      dockerfile: src/Dockerfile # jar-ul compilat
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgre_db:5432/TradingEngineDB
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
-    #ca sa fim siguri ca baza de date e incarcata ianinte de spring app
     depends_on:
       - postgre_db
+      - python_api
+
+  # python API
+  python_api:
+    build:
+      context: matching-engine
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"

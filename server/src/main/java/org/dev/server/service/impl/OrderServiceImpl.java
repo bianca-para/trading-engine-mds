@@ -34,7 +34,11 @@ public class OrderServiceImpl implements OrderService {
         User user = userRepository.findById(orderRequestDto.userId())
                 .orElseThrow(() -> new IllegalArgumentException("User with id " + orderRequestDto.userId() + " not found."));
 
-
+        System.out.println("Acesta este un update live!");
+        System.out.println("testsdaseoiqwiejqwioekjqwkleq");
+        System.out.println("testsdaseoiqwiejqwioekjqwkleq");
+        System.out.println("dsadsadsadsadasdasdsadas");
+        System.out.println("testsdaseoiqwiejqwioekjqwkleq");
         Asset asset = assetRepository.findById(orderRequestDto.assetId())
                 .orElseThrow(() -> new IllegalArgumentException("Asset with id " + orderRequestDto.assetId() + " not found."));
 
@@ -49,9 +53,10 @@ public class OrderServiceImpl implements OrderService {
         body.put("price", savedOrder.getPrice());
         body.put("quantity", savedOrder.getQuantity());
         body.put("side", savedOrder.getType().toString());
-        body.put("timestamp", savedOrder.getCreatedAt());
+        int hour = savedOrder.getCreatedAt().getHour();
+        body.put("timestamp", hour);
 
-        String url = "http://127.0.0.1:8000/order";
+        String url = "http://python_api:8000/order";
         System.out.println("Sending to Python: " + body);
         restTemplate.postForObject(url, body, String.class);
 
