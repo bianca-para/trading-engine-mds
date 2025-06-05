@@ -2,19 +2,18 @@ package org.dev.server.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.dev.server.dto.UserRequestLoginDto;
-import org.dev.server.dto.UserRequestRegisterDto;
-import org.dev.server.dto.UserResponseDto;
-import org.dev.server.dto.UserResponseLogin;
+import org.dev.server.dto.user.UserRequestLoginDto;
+import org.dev.server.dto.user.UserRequestRegisterDto;
+import org.dev.server.dto.user.UserResponseDto;
+import org.dev.server.dto.user.UserResponseLogin;
 import org.dev.server.jwtconfig.JWTUtil;
 import org.dev.server.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/user")
@@ -45,6 +44,10 @@ public class UserController {
         return ResponseEntity.ok(new UserResponseLogin(token, "Token generated successfully!"));
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable UUID id) {
+        UserResponseDto userResponseDto = userService.getUserById(id);
+        return ResponseEntity.ok().body(userResponseDto);
+    }
 
-    //TO DO - DELETE dupa id(DELETE), UPDATE - POST SAU PATCH, GETALLUSERS - GET
 }

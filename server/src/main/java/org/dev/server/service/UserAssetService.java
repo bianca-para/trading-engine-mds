@@ -1,6 +1,6 @@
 package org.dev.server.service;
 
-import org.dev.server.dto.UserResponseDto;
+import org.dev.server.dto.user.UserResponseDto;
 import org.dev.server.dto.asset.AssetResponseDto;
 
 import java.math.BigDecimal;

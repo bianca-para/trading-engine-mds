@@ -1,7 +1,7 @@
 package org.dev.server.mapper;
 
-import org.dev.server.dto.UserRequestRegisterDto;
-import org.dev.server.dto.UserResponseDto;
+import org.dev.server.dto.user.UserRequestRegisterDto;
+import org.dev.server.dto.user.UserResponseDto;
 import org.dev.server.model.User;
 
 import java.time.LocalDate;

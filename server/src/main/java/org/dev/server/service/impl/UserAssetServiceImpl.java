@@ -1,7 +1,7 @@
 package org.dev.server.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.dev.server.dto.UserResponseDto;
+import org.dev.server.dto.user.UserResponseDto;
 import org.dev.server.dto.asset.AssetResponseDto;
 import org.dev.server.exception.DatabaseException;
 import org.dev.server.exception.InsufficientQuantityException;
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

@@ -1,10 +1,8 @@
-package org.dev.server.dto;
+package org.dev.server.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import org.dev.server.model.enums.KYCStatus;
-import org.springframework.validation.annotation.Validated;
 
 public record UserRequestRegisterDto(
         @NotBlank(message = "Username should not be blank.")

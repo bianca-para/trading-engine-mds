@@ -6,6 +6,7 @@ import org.dev.server.dto.order.OrderRequestDto;
 import org.dev.server.dto.order.OrderResponseDto;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface OrderService {
     OrderResponseDto createOrder(OrderRequestDto orderRequestDto);
@@ -16,5 +17,5 @@ public interface OrderService {
 
     OrderResponseDto getOrderDetails(Long orderId);
 
-    List<OrderResponseDto> getAllOrdersForUser(Long userId);
+    List<OrderResponseDto> getAllOrdersForUser(UUID userId);
 }

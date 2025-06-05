@@ -1,9 +1,8 @@
 package org.dev.server.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.dev.server.dto.UserResponseDto;
+import org.dev.server.dto.user.UserResponseDto;
 import org.dev.server.dto.asset.AssetResponseDto;
-import org.dev.server.model.UserAsset;
 import org.dev.server.service.UserAssetService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

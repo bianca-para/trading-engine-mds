@@ -3,6 +3,7 @@ package org.dev.server.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.dev.server.dto.order.OrderRequestDto;
 import org.dev.server.dto.order.OrderResponseDto;
+import org.dev.server.dto.order.PythonOrderRequestoDto;
 import org.dev.server.mapper.OrderMapper;
 import org.dev.server.model.Asset;
 import org.dev.server.model.Order;
@@ -19,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,41 +29,36 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final AssetRepository assetRepository;
-    @Autowired
     private final RestTemplate restTemplate;
 
     public OrderResponseDto createOrder(OrderRequestDto orderRequestDto) {
         User user = userRepository.findById(orderRequestDto.userId())
                 .orElseThrow(() -> new IllegalArgumentException("User with id " + orderRequestDto.userId() + " not found."));
 
-        System.out.println("Acesta este un update live!");
-        System.out.println("testsdaseoiqwiejqwioekjqwkleq");
-        System.out.println("testsdaseoiqwiejqwioekjqwkleq");
-        System.out.println("dsadsadsadsadasdasdsadas");
-        System.out.println("testsdaseoiqwiejqwioekjqwkleq");
         Asset asset = assetRepository.findById(orderRequestDto.assetId())
                 .orElseThrow(() -> new IllegalArgumentException("Asset with id " + orderRequestDto.assetId() + " not found."));
 
         Order order = OrderMapper.toEntity(orderRequestDto, user, asset);
         Order savedOrder = orderRepository.save(order);
 
-        // sa trimit spre python
-        Map<String, Object> body = new HashMap<>();
-        body.put("id", savedOrder.getOrderId());
-        body.put("traderId", savedOrder.getUser().getId().toString());
-        body.put("symbol", savedOrder.getAsset().getSymbol());
-        body.put("price", savedOrder.getPrice());
-        body.put("quantity", savedOrder.getQuantity());
-        body.put("side", savedOrder.getType().toString());
-        int hour = savedOrder.getCreatedAt().getHour();
-        body.put("timestamp", hour);
-
-        String url = "http://python_api:8000/order";
-        System.out.println("Sending to Python: " + body);
-        restTemplate.postForObject(url, body, String.class);
+        sendOrderToPythonAPI(savedOrder);
 
         return OrderMapper.toDto(savedOrder);
     }
+
+    private void sendOrderToPythonAPI(Order order) {
+        PythonOrderRequestoDto dto = OrderMapper.toPythonRequestDto(order);
+
+        String url = "http://python_api:8000/order";
+        System.out.println("Sending to Python: " + dto);
+
+        try{
+            restTemplate.postForObject(url, dto, String.class);
+        } catch (Exception e) {
+            System.err.println("Failed to send order to Python API: " + e.getMessage());
+        }
+    }
+
     public OrderResponseDto cancelOrder(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order with id " + orderId + " not found."));
@@ -93,16 +90,15 @@ public class OrderServiceImpl implements OrderService {
         return OrderMapper.toDto(order);
 
     }
-    public List<OrderResponseDto> getAllOrdersForUser(Long userId) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new IllegalArgumentException("User with id " + userId + " not found."));
-//
-//        List<Order> orders = orderRepository.findAllByUser(user);
-//
-//        return orders.stream()
-//                .map(OrderMapper::toDto)
-//                .toList();
-        return null;
+    public List<OrderResponseDto> getAllOrdersForUser(UUID userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User with id " + userId + " not found."));
+
+        List<Order> orders = orderRepository.findAllByUser(user);
+
+        return orders.stream()
+                .map(OrderMapper::toDto)
+                .toList();
 
     }
 

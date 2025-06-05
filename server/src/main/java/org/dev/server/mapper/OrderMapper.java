@@ -2,6 +2,7 @@ package org.dev.server.mapper;
 
 import org.dev.server.dto.order.OrderRequestDto;
 import org.dev.server.dto.order.OrderResponseDto;
+import org.dev.server.dto.order.PythonOrderRequestoDto;
 import org.dev.server.model.Asset;
 import org.dev.server.model.Order;
 import org.dev.server.model.User;
@@ -29,6 +30,17 @@ public class OrderMapper {
                 order.getType(),
                 order.getStatus(),
                 order.getCreatedAt()
+        );
+    }
+    public static PythonOrderRequestoDto toPythonRequestDto(Order order) {
+        return new PythonOrderRequestoDto(
+                order.getOrderId(),
+                order.getUser().getId().toString(),
+                order.getAsset().getSymbol(),
+                order.getPrice(),
+                order.getQuantity(),
+                order.getType().toString(),
+                order.getCreatedAt().getHour()
         );
     }
 }
