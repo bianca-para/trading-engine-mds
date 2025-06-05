@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.Base64;
@@ -66,5 +67,13 @@ public class JWTUtil {
     //code to get expiration date
     public String getSubject(String token) {
         return getClaims(token).getSubject();
+    }
+
+    public String getCurrentUsername() {
+        String token = SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
+        if (token != null && !token.isEmpty()) {
+            return getSubject(token);
+        }
+        return null;
     }
 }

@@ -1,4 +1,4 @@
-package org.dev.server.dto;
+package org.dev.server.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

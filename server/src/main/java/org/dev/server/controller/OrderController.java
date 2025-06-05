@@ -9,14 +9,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/order")
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
 
-    // Define your endpoints here
-    // For example:
+
     @PostMapping
     public ResponseEntity<OrderResponseDto> createOrder(@Valid @RequestBody OrderRequestDto orderRequestDto) {
         OrderResponseDto createdOrder = orderService.createOrder(orderRequestDto);
@@ -32,5 +34,10 @@ public class OrderController {
     public ResponseEntity<OrderResponseDto> getOrderDetails(@PathVariable Long orderId) {
         OrderResponseDto orderDetails = orderService.getOrderDetails(orderId);
         return ResponseEntity.ok(orderDetails);
+    }
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<OrderResponseDto>> getAllOrdersForUser(@PathVariable UUID userId) {
+        List<OrderResponseDto> orders = orderService.getAllOrdersForUser(userId);
+        return ResponseEntity.ok(orders);
     }
 }

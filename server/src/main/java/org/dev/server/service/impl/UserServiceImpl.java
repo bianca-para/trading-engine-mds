@@ -1,8 +1,8 @@
 package org.dev.server.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.dev.server.dto.UserRequestRegisterDto;
-import org.dev.server.dto.UserResponseDto;
+import org.dev.server.dto.user.UserRequestRegisterDto;
+import org.dev.server.dto.user.UserResponseDto;
 import org.dev.server.exception.EmailAlreadyExistsException;
 import org.dev.server.exception.UsernameAlreadyExistsException;
 import org.dev.server.mapper.UserMapper;
@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -75,5 +76,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         return springUser;
+    }
+    @Override
+    public UserResponseDto getUserById(UUID id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if (userOptional.isEmpty()) {
+            throw new UsernameNotFoundException("User with id: " + id + " not found");
+        }
+        return UserMapper.toDto(userOptional.get());
     }
 }
