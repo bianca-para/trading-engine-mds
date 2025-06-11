@@ -101,6 +101,11 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
 
     }
+    @Override
+    public List<OrderResponseDto> getAllOrdersForAsset(Long assetId) {
+        List<Order> orders = orderRepository.fetchByAssetJpa(assetId);
+        return orders.stream().map(OrderMapper::toDto).toList();
+    }
 
 
 }

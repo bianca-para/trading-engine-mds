@@ -14,6 +14,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/order")
+@CrossOrigin(origins="*")
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
@@ -39,5 +40,9 @@ public class OrderController {
     public ResponseEntity<List<OrderResponseDto>> getAllOrdersForUser(@PathVariable UUID userId) {
         List<OrderResponseDto> orders = orderService.getAllOrdersForUser(userId);
         return ResponseEntity.ok(orders);
+    }
+    @GetMapping("/asset/{assetId}")
+    public ResponseEntity<List<OrderResponseDto>> getByAsset(@PathVariable Long assetId) {
+        return ResponseEntity.ok(orderService.getAllOrdersForAsset(assetId));
     }
 }

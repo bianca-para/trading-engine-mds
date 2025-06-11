@@ -1,9 +1,10 @@
-spring:
+pring:
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -11,9 +12,21 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
   flyway:
     enabled: true
-    locations: classpath:db/migration/postgres/ddl,classpath:db/migration/dml
+    locations: classpath:db/migration/postgres/ddl,classpath:db/migration/postgres/dml
+
+# Optional server port override
+# server:
+#   port: 8080
+
 app:
   secret:
     key: J@!gt*Kbut
+
+logging:
+  level:
+    org:
+      dev:
+        server: DEBUG

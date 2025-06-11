@@ -18,4 +18,6 @@ public interface OrderService {
     OrderResponseDto getOrderDetails(Long orderId);
 
     List<OrderResponseDto> getAllOrdersForUser(UUID userId);
+
+    List<OrderResponseDto> getAllOrdersForAsset(Long assetId);
 }

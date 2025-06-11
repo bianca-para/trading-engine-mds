@@ -42,7 +42,8 @@ public class User {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    private KYCStatus kycStatus;
+    @Column(name = "kyc_status", nullable = false)
+    private KYCStatus kycStatus = KYCStatus.VERIFIED;
 
 //    @Enumerated(EnumType.STRING)
 //    private Role role;

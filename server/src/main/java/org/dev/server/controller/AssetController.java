@@ -14,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/asset")
 @RequiredArgsConstructor
+
 public class AssetController {
 
     private final AssetService assetService;
