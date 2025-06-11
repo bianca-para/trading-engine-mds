@@ -28,6 +28,13 @@ class orderbookLevel:
     def removeOrder(self):
         return self.orders.popleft()
 
+    def removeOrderById(self, order_id):
+        for i, o in enumerate(self.orders):
+            if o.id == order_id:
+                del self.orders[i]
+                return True
+        return False
+
     def seeFirstOrder(self):
         return self.orders[0] if self.orders else None
 
@@ -63,6 +70,18 @@ class orderbook:
             if price in self.bidLevels:
                 del self.bidLevels[price]
                 self.bidList.remove(-price)
+
+    def cancelOrder(self, order_id, trader_id, side):
+        levels = self.bidLevels if side == 'BUY' else self.askLevels
+
+        for price in list(levels.keys()):
+            level = levels[price]
+            removed = level.removeOrderById(order_id)
+            if removed:
+                if level.isEmpty():
+                    self.removeLevel(price, side)
+                return True
+        return False
 
 
 class matchingEngine:
@@ -163,6 +182,10 @@ class matchingEngine:
                     break
         return trades
 
+    def cancelOrder(self, symbol, order_id, trader_id, side):
+        if symbol not in self.orderBooks:
+            return False
+        return self.orderBooks[symbol].cancelOrder(order_id, trader_id, side)
 
 # Run sample test
 engine = matchingEngine()
