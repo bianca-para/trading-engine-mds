@@ -1,0 +1,13 @@
+#GET http://127.0.0.1:8000/orderbook/BTC
+POST http://127.0.0.1:8000/order
+Content-Type: application/json
+
+{
+          "id": 16,
+          "traderId": "0be48d73-93a2-4306-85fa-71bd8ad64cdb",
+          "symbol": "BTC",
+          "price": 100.0,
+          "quantity": 5,
+          "side": "BUY",
+          "timestamp": "1970-01-01T00:00:22+00:00"
+}

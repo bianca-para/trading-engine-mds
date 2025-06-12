@@ -1,3 +1,5 @@
+// src/components/OrderForm.tsx
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +10,7 @@ import { ArrowRight } from "lucide-react";
 import { OrderRequest } from "@/lib/services/orderService";
 
 interface OrderFormProps {
-  assetId: number;               // ← newly required prop
+  assetId: number;
   symbol: string;
   currentPrice: number;
   isAuthenticated: boolean;
@@ -16,51 +18,32 @@ interface OrderFormProps {
   className?: string;
 }
 
-const OrderForm = ({
-                     assetId,
-                     symbol,
-                     currentPrice,
-                     isAuthenticated,
-                     onPlaceOrder,
-                     className,
-                   }: OrderFormProps) => {
+export default function OrderForm({
+                                    assetId,
+                                    symbol,
+                                    currentPrice,
+                                    isAuthenticated,
+                                    onPlaceOrder,
+                                    className,
+                                  }: OrderFormProps) {
   const [orderType, setOrderType] = useState<"market" | "limit">("market");
-  const [amount, setAmount] = useState("");
-  const [price, setPrice] = useState(currentPrice.toString());
-  const [total, setTotal] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [amount, setAmount] = useState<string>("");
+  const [price, setPrice] = useState<string>(currentPrice.toString());
+  const [total, setTotal] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
-  // Helpers to recalc total/amount
+  // Now each field only updates its own state:
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = e.target.value;
-    setAmount(v);
-    if (v && price) {
-      setTotal((parseFloat(v) * parseFloat(price)).toFixed(2));
-    } else {
-      setTotal("");
-    }
+    setAmount(e.target.value);
   };
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = e.target.value;
-    setPrice(v);
-    if (amount && v) {
-      setTotal((parseFloat(amount) * parseFloat(v)).toFixed(2));
-    } else {
-      setTotal("");
-    }
+    setPrice(e.target.value);
   };
   const handleTotalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = e.target.value;
-    setTotal(v);
-    if (v && price && parseFloat(price) > 0) {
-      setAmount((parseFloat(v) / parseFloat(price)).toFixed(6));
-    } else {
-      setAmount("");
-    }
+    setTotal(e.target.value);
   };
 
-  const handleSubmit = async (type: "buy" | "sell") => {
+  const handleSubmit = async (side: "buy" | "sell") => {
     if (!isAuthenticated) {
       toast.error("Authentication required", {
         description: "Please sign in to place orders.",
@@ -68,7 +51,6 @@ const OrderForm = ({
       return;
     }
 
-    // pull the userId out of localStorage
     const userId = localStorage.getItem("userId");
     if (!userId) {
       toast.error("User not found", {
@@ -79,44 +61,40 @@ const OrderForm = ({
 
     if (!amount || parseFloat(amount) <= 0) {
       toast.error("Invalid amount", {
-        description: "Please enter a valid amount."
+        description: "Please enter a valid amount.",
       });
       return;
     }
-
     if (orderType === "limit" && (!price || parseFloat(price) <= 0)) {
       toast.error("Invalid price", {
-        description: "Please enter a valid price."
+        description: "Please enter a valid price.",
       });
       return;
     }
 
     setLoading(true);
     try {
-      const now = new Date();
-      const createdAt = now.toISOString();
+      const now = new Date().toISOString();
       const orderData: OrderRequest = {
-        userId,                             // from localStorage
-        assetId,                            // from prop
+        userId,
+        assetId,
         quantity: parseFloat(amount),
         price:
-            orderType === "market"
-                ? currentPrice
-                : parseFloat(price),
-        type: type.toUpperCase() as "BUY" | "SELL",
-        createdAt: createdAt,
+            orderType === "market" ? currentPrice : parseFloat(price),
+        type: side.toUpperCase() as "BUY" | "SELL",
+        createdAt: now,
       };
 
       await onPlaceOrder(orderData);
 
-      // reset
+      // reset the form (but keep price at current market)
       setAmount("");
       setPrice(currentPrice.toString());
       setTotal("");
     } catch (err) {
       console.error("Error placing order:", err);
       toast.error("Failed to place order", {
-        description: "Please try again later."
+        description: "Please try again later.",
       });
     } finally {
       setLoading(false);
@@ -128,10 +106,16 @@ const OrderForm = ({
         <Tabs defaultValue="buy" className="w-full">
           <div className="p-4 border-b">
             <TabsList className="w-full grid grid-cols-2">
-              <TabsTrigger value="buy" className="data-[state=active]:bg-trade-buy/10 data-[state=active]:text-trade-buy">
+              <TabsTrigger
+                  value="buy"
+                  className="data-[state=active]:bg-trade-buy/10 data-[state=active]:text-trade-buy"
+              >
                 Buy
               </TabsTrigger>
-              <TabsTrigger value="sell" className="data-[state=active]:bg-trade-sell/10 data-[state=active]:text-trade-sell">
+              <TabsTrigger
+                  value="sell"
+                  className="data-[state=active]:bg-trade-sell/10 data-[state=active]:text-trade-sell"
+              >
                 Sell
               </TabsTrigger>
             </TabsList>
@@ -181,7 +165,8 @@ const OrderForm = ({
                 </div>
               </div>
             </div>
-            {/* Limit price */}
+
+            {/* Limit Price */}
             {orderType === "limit" && (
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">
@@ -201,6 +186,7 @@ const OrderForm = ({
                   </div>
                 </div>
             )}
+
             {/* Total */}
             <div className="space-y-1.5">
               <label className="text-xs text-muted-foreground">
@@ -219,6 +205,7 @@ const OrderForm = ({
                 </div>
               </div>
             </div>
+
             <Button
                 onClick={() => handleSubmit("buy")}
                 className="w-full bg-trade-buy hover:bg-trade-buy/90"
@@ -234,7 +221,7 @@ const OrderForm = ({
 
           {/* SELL */}
           <TabsContent value="sell" className="p-4 space-y-4 animate-fade-in">
-            {/* same fields as buy */}
+            {/* Amount */}
             <div className="space-y-1.5">
               <label className="text-xs text-muted-foreground">
                 Amount ({symbol})
@@ -252,6 +239,8 @@ const OrderForm = ({
                 </div>
               </div>
             </div>
+
+            {/* Limit Price */}
             {orderType === "limit" && (
                 <div className="space-y-1.5">
                   <label className="text-xs text-muted-foreground">
@@ -271,6 +260,8 @@ const OrderForm = ({
                   </div>
                 </div>
             )}
+
+            {/* Total */}
             <div className="space-y-1.5">
               <label className="text-xs text-muted-foreground">
                 Total (USD)
@@ -288,6 +279,7 @@ const OrderForm = ({
                 </div>
               </div>
             </div>
+
             <Button
                 onClick={() => handleSubmit("sell")}
                 className="w-full bg-trade-sell hover:bg-trade-sell/90"
@@ -303,6 +295,4 @@ const OrderForm = ({
         </Tabs>
       </div>
   );
-};
-
-export default OrderForm;
+}

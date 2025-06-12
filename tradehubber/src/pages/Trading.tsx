@@ -224,7 +224,7 @@ const Trading = () => {
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <OrderBook assetId={numericAssetId} />
+                  <OrderBook symbol={marketData.symbol} />
                   <MarketNews symbol={marketData.symbol} />
                 </div>
               </div>

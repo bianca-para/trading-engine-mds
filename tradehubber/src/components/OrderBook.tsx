@@ -1,90 +1,91 @@
 // src/components/OrderBook.tsx
 
 import { useState, useEffect } from "react";
-import { orderService, OrderResponse } from "@/lib/services/orderService";
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { useToast } from "@/components/ui/use-toast";
+import { API_BASE_URL } from "@/lib/services/config";
 
-interface OrderBookProps {
-  assetId: number;
+interface Level {
+  price: number;
+  orders: Array<{
+    id: number;
+    traderId: string;
+    symbol: string;
+    price: number;
+    quantity: number;
+    side: string;
+    timestamp: string;
+  }>;
 }
 
-const OrderBook = ({ assetId }: OrderBookProps) => {
-  const [orders, setOrders] = useState<OrderResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+interface OrderBookResponse {
+  bids: Level[];
+  asks: Level[];
+}
+
+interface OrderBookProps {
+  symbol: string;
+}
+
+export default function OrderBook({ symbol }: OrderBookProps) {
+  const [bids, setBids] = useState<Level[]>([]);
+  const [asks, setAsks] = useState<Level[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      setLoading(true);
-      setError(null);
+    const fetchBook = async () => {
       try {
-        // assetId may be passed as number or string now
-        const data = await orderService.getOrdersByAsset(assetId);
-        setOrders(data);
+        console.log(symbol)
+        const res = await fetch(`http://127.0.0.1:8000/orderbook/${encodeURIComponent(symbol)}`, {
+          headers: { "Content-Type": "application/json" },
+        });
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`HTTP ${res.status}: ${text}`);
+        }
+        const data: OrderBookResponse = await res.json();
+        setBids(data.bids);
+        setAsks(data.asks);
       } catch (err: any) {
         console.error("Error fetching order book:", err);
-        const msg = err.response?.data?.message || err.message || "Failed to load orders";
-        setError(msg);
-        toast({
-          title: "Order Book Error",
-          description: msg,
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
+        setError(err.message);
       }
     };
 
-    fetchOrders();
-    const iv = setInterval(fetchOrders, 5000);
-    return () => clearInterval(iv);
-  }, [assetId, toast]);
+    fetchBook();
+    const id = setInterval(fetchBook, 5_000);
+    return () => clearInterval(id);
+  }, [symbol]);
 
-  if (loading) {
-    return <p className="p-4 text-center">Loading order book…</p>;
-  }
   if (error) {
-    return <p className="p-4 text-center text-red-500">{error}</p>;
-  }
-  if (orders.length === 0) {
-    return <p className="p-4 text-center">No orders for this asset.</p>;
+    return <p className="text-red-500">Order book error: {error}</p>;
   }
 
   return (
-      <div className="bg-card border rounded-lg overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>User ID</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Quantity</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Date</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {orders.map((o) => (
-                <TableRow key={o.orderId}>
-                  <TableCell>{o.userId}</TableCell>
-                  <TableCell>{o.type}</TableCell>
-                  <TableCell>{o.quantity}</TableCell>
-                  <TableCell>${o.price.toFixed(2)}</TableCell>
-                  <TableCell>{o.status}</TableCell>
-                  <TableCell>
-                    {new Date(o.createdAt).toLocaleString(undefined, {
-                      dateStyle: "short",
-                      timeStyle: "short",
-                    })}
-                  </TableCell>
-                </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+      <div className="bg-card border rounded-lg p-4">
+        <h3 className="text-xl font-semibold mb-4">Order Book: {symbol}</h3>
+        <div className="grid grid-cols-2 gap-6">
+          <div>
+            <h4 className="text-lg font-medium mb-2 text-trade-buy">Bids</h4>
+            <ul className="space-y-1">
+              {bids.map((lvl) => (
+                  <li key={lvl.price} className="flex justify-between">
+                    <span>${lvl.price.toFixed(2)}</span>
+                    <span>{lvl.orders.length} order{lvl.orders.length !== 1 && "s"}</span>
+                  </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-lg font-medium mb-2 text-trade-sell">Asks</h4>
+            <ul className="space-y-1">
+              {asks.map((lvl) => (
+                  <li key={lvl.price} className="flex justify-between">
+                    <span>${lvl.price.toFixed(2)}</span>
+                    <span>{lvl.orders.length} order{lvl.orders.length !== 1 && "s"}</span>
+                  </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
   );
-};
-
-export default OrderBook;
+}
