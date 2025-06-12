@@ -1,5 +1,5 @@
 // src/lib/services/orderService.ts
-import axios from "axios";
+
 import { API_BASE_URL } from "./config";
 
 export interface OrderRequest {
@@ -8,6 +8,7 @@ export interface OrderRequest {
   quantity: number;
   price: number;
   type: "BUY" | "SELL";
+  createdAt: string  ;
 }
 
 export interface OrderResponse {
@@ -22,27 +23,44 @@ export interface OrderResponse {
 }
 
 export const orderService = {
-  createOrder(orderRequest: OrderRequest) {
-    return axios
-        .post<OrderResponse>(`${API_BASE_URL}/order`, orderRequest)
-        .then((res) => res.data);
+  /** Place a new order */
+  async createOrder(orderRequest: OrderRequest): Promise<OrderResponse> {
+    const resp = await fetch(`${API_BASE_URL}/order`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderRequest),
+    });
+    if (!resp.ok) throw new Error(`Failed to create order (${resp.status})`);
+    return resp.json();
   },
 
-  getOrdersByAsset(assetId: number) {
-    return axios
-        .get<OrderResponse[]>(`${API_BASE_URL}/order/asset/${assetId}`)
-        .then((res) => res.data);
+  /** Get all orders for a given asset */
+  async getOrdersByAsset(assetId: number | string): Promise<OrderResponse[]> {
+    const resp = await fetch(`${API_BASE_URL}/order/asset/${assetId}`, {
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!resp.ok) {
+      const text = await resp.text();
+      throw new Error(`Failed to fetch orders (${resp.status}): ${text}`);
+    }
+    return resp.json();
   },
 
-  cancelOrder(orderId: number) {
-    return axios
-        .delete(`${API_BASE_URL}/order/${orderId}`)
-        .then((res) => res.data);
+  /** Cancel an order */
+  async cancelOrder(orderId: number): Promise<OrderResponse> {
+    const resp = await fetch(`${API_BASE_URL}/order/${orderId}`, {
+      method: "DELETE",
+    });
+    if (!resp.ok) throw new Error(`Failed to cancel order (${resp.status})`);
+    return resp.json();
   },
 
-  getOrderDetails(orderId: number) {
-    return axios
-        .get<OrderResponse>(`${API_BASE_URL}/order/${orderId}`)
-        .then((res) => res.data);
+  /** Get details of a single order */
+  async getOrderDetails(orderId: number): Promise<OrderResponse> {
+    const resp = await fetch(`${API_BASE_URL}/order/${orderId}`, {
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!resp.ok) throw new Error(`Failed to fetch order (${resp.status})`);
+    return resp.json();
   },
 };

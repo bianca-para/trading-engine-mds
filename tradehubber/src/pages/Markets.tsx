@@ -170,7 +170,7 @@ const Markets = () => {
                                   </TableCell>
                                   <TableCell className="px-4 py-4 text-right">
                                     <Button variant="outline" size="sm" asChild>
-                                      <Link to={`/trading/${asset.symbol}`}>Trade</Link>
+                                      <Link to={`/trading/${asset.assetId}`}>Trade</Link>
 
                                     </Button>
                                   </TableCell>

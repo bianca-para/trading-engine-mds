@@ -1,95 +1,88 @@
 // src/components/OrderBook.tsx
+
 import { useState, useEffect } from "react";
 import { orderService, OrderResponse } from "@/lib/services/orderService";
-import { toast } from "sonner";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { useToast } from "@/components/ui/use-toast";
 
 interface OrderBookProps {
   assetId: number;
 }
 
 const OrderBook = ({ assetId }: OrderBookProps) => {
-  const [asks, setAsks] = useState<OrderResponse[]>([]);
-  const [bids, setBids] = useState<OrderResponse[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [orders, setOrders] = useState<OrderResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchOrders = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        setIsLoading(true);
-        const orders = await orderService.getOrdersByAsset(assetId);
-        const pending = orders.filter((o) => o.status === "PENDING");
-
-        const asksList = pending
-            .filter((o) => o.type === "SELL")
-            .sort((a, b) => a.price - b.price);
-
-        const bidsList = pending
-            .filter((o) => o.type === "BUY")
-            .sort((a, b) => b.price - a.price);
-
-        setAsks(asksList);
-        setBids(bidsList);
-      } catch (error) {
-        console.error("Error fetching order book:", error);
-        toast.error("Failed to fetch order book", {
-          description: "Please try again later.",
+        // assetId may be passed as number or string now
+        const data = await orderService.getOrdersByAsset(assetId);
+        setOrders(data);
+      } catch (err: any) {
+        console.error("Error fetching order book:", err);
+        const msg = err.response?.data?.message || err.message || "Failed to load orders";
+        setError(msg);
+        toast({
+          title: "Order Book Error",
+          description: msg,
+          variant: "destructive",
         });
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
     fetchOrders();
-    const interval = setInterval(fetchOrders, 5000);
-    return () => clearInterval(interval);
-  }, [assetId]);
+    const iv = setInterval(fetchOrders, 5000);
+    return () => clearInterval(iv);
+  }, [assetId, toast]);
 
-  if (isLoading) {
-    return (
-        <div className="bg-card border rounded-lg p-4">
-          <h3 className="text-lg font-semibold mb-4">Order Book</h3>
-          <div className="animate-pulse space-y-4">
-            <div className="h-4 bg-muted rounded w-3/4"></div>
-            <div className="h-4 bg-muted rounded w-1/2"></div>
-            <div className="h-4 bg-muted rounded w-2/3"></div>
-          </div>
-        </div>
-    );
+  if (loading) {
+    return <p className="p-4 text-center">Loading order book…</p>;
+  }
+  if (error) {
+    return <p className="p-4 text-center text-red-500">{error}</p>;
+  }
+  if (orders.length === 0) {
+    return <p className="p-4 text-center">No orders for this asset.</p>;
   }
 
   return (
-      <div className="bg-card border rounded-lg p-4">
-        <h3 className="text-lg font-semibold mb-4">Order Book</h3>
-        <div className="mb-4">
-          <div className="text-sm text-muted-foreground mb-2">Asks</div>
-          <div className="space-y-1">
-            {asks.map((order) => (
-                <div
-                    key={order.orderId}
-                    className="flex justify-between items-center p-2 rounded hover:bg-muted/50 cursor-pointer"
-                >
-                  <span className="text-trade-sell">{order.price.toFixed(2)}</span>
-                  <span>{order.quantity.toFixed(4)}</span>
-                  <span>{(order.price * order.quantity).toFixed(2)}</span>
-                </div>
+      <div className="bg-card border rounded-lg overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>User ID</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Quantity</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Date</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {orders.map((o) => (
+                <TableRow key={o.orderId}>
+                  <TableCell>{o.userId}</TableCell>
+                  <TableCell>{o.type}</TableCell>
+                  <TableCell>{o.quantity}</TableCell>
+                  <TableCell>${o.price.toFixed(2)}</TableCell>
+                  <TableCell>{o.status}</TableCell>
+                  <TableCell>
+                    {new Date(o.createdAt).toLocaleString(undefined, {
+                      dateStyle: "short",
+                      timeStyle: "short",
+                    })}
+                  </TableCell>
+                </TableRow>
             ))}
-          </div>
-        </div>
-        <div>
-          <div className="text-sm text-muted-foreground mb-2">Bids</div>
-          <div className="space-y-1">
-            {bids.map((order) => (
-                <div
-                    key={order.orderId}
-                    className="flex justify-between items-center p-2 rounded hover:bg-muted/50 cursor-pointer"
-                >
-                  <span className="text-trade-buy">{order.price.toFixed(2)}</span>
-                  <span>{order.quantity.toFixed(4)}</span>
-                  <span>{(order.price * order.quantity).toFixed(2)}</span>
-                </div>
-            ))}
-          </div>
-        </div>
+          </TableBody>
+        </Table>
       </div>
   );
 };

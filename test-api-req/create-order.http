@@ -1,0 +1,11 @@
+POST http://localhost:8080/order
+Content-Type: application/json
+
+{
+  "userId":     "11111111-1111-1111-1111-111111111111",
+  "assetId":    1,
+  "quantity":   3,
+  "price":      109305,
+  "type":       "BUY",
+  "createdAt":  "2025-06-12T21:34:34.771"
+}

@@ -28,6 +28,8 @@ export interface UserResponse {
 export interface LoginResponse {
   token: string;
   message: string;
+  userId: string;
+  username: string;
 }
 
 export const userService = {
@@ -37,7 +39,10 @@ export const userService = {
   },
 
   async login(credentials: UserLoginRequest): Promise<LoginResponse> {
-    const response = await axios.post(`${API_BASE_URL}/user/login`, credentials);
+    const response = await axios.post<LoginResponse>(
+        `${API_BASE_URL}/user/login`,
+        credentials
+    );
     return response.data;
   },
 
@@ -46,7 +51,6 @@ export const userService = {
     return response.data;
   },
 
-  // Helper function to set the auth token in axios headers
   setAuthToken(token: string) {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -54,4 +58,4 @@ export const userService = {
       delete axios.defaults.headers.common['Authorization'];
     }
   }
-}; 
+};

@@ -2,7 +2,7 @@ POST localhost:8080/user
 Content-Type: application/json
 
 {
-  "username": "userexemplu",
+  "username": "andrei123",
   "email": "email@mail.com",
   "password": "parolamea123"
 }

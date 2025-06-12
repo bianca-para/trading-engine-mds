@@ -1,4 +1,5 @@
 // src/pages/Trading.tsx
+
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -15,55 +16,57 @@ import MarketNews from "@/components/MarketNews";
 import PriceChip from "@/components/PriceChip";
 import { assetService, AssetResponse } from "@/lib/services/assetService";
 import { orderService, OrderRequest } from "@/lib/services/orderService";
-import { tradeService } from "@/lib/services/tradeService";
 import { useToast } from "@/components/ui/use-toast";
 import { userService } from "@/lib/services/userService";
 
 const Trading = () => {
   const { assetId } = useParams<{ assetId: string }>();
   const numericAssetId = Number(assetId);
+
   const [isAuthenticated, setIsAuthenticated] = useState(
-      () => {
-        return localStorage.getItem("isAuthenticated") === "true";
-      }
+      () => localStorage.getItem("isAuthenticated") === "true"
   );
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalTab, setAuthModalTab] = useState<"login" | "signup">("login");
+
   const [marketData, setMarketData] = useState<AssetResponse | null>(null);
-  const [recentTrades, setRecentTrades] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Attach token if present
+  // only set auth header once (for axios/orderService calls)
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) userService.setAuthToken(token);
+    userService.setAuthToken(token ?? "");
   }, []);
 
-  // Fetch asset & trades every 5s
+  // fetch the asset (and re-fetch every 5s)
   useEffect(() => {
-    if (isNaN(numericAssetId)) return;
+    if (isNaN(numericAssetId)) {
+      setError("Invalid asset ID in URL");
+      setLoading(false);
+      return;
+    }
 
-    const fetchMarketData = async () => {
+    const fetchOne = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        const asset = await assetService.getAsset(numericAssetId);
-        setMarketData(asset);
-
-        // const trades = await tradeService.getTradesByAsset(numericAssetId);
-        // setRecentTrades(trades);
-      } catch (err) {
-        console.error(err);
-        toast({
-          title: "Error",
-          description: "Failed to fetch market data",
-          variant: "destructive",
-        });
+        const a = await assetService.getAsset(numericAssetId);
+        setMarketData(a);
+      } catch (e: any) {
+        console.error(e);
+        setError(e.message || "Error fetching asset");
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchMarketData();
-    const iv = setInterval(fetchMarketData, 5000);
+    fetchOne();
+    const iv = setInterval(fetchOne, 100000000000000);
     return () => clearInterval(iv);
-  }, [numericAssetId, toast]);
+  }, [numericAssetId]);
 
   const handleLogin = () => {
     setAuthModalTab("login");
@@ -77,7 +80,6 @@ const Trading = () => {
     setIsAuthenticated(false);
     localStorage.removeItem("token");
     localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("userEmail");
     userService.setAuthToken("");
   };
   const handleAuthSuccess = () => setIsAuthenticated(true);
@@ -94,14 +96,11 @@ const Trading = () => {
     try {
       await orderService.createOrder(orderData);
       toast({ title: "Success", description: "Order placed successfully" });
-
-      // refresh marketData
-      if (numericAssetId) {
-        const updated = await assetService.getAsset(numericAssetId);
-        setMarketData(updated);
-      }
-    } catch (err) {
-      console.error(err);
+      // refresh the price
+      const updated = await assetService.getAsset(numericAssetId);
+      setMarketData(updated);
+    } catch (e) {
+      console.error(e);
       toast({
         title: "Error",
         description: "Failed to place order",
@@ -110,7 +109,8 @@ const Trading = () => {
     }
   };
 
-  if (!marketData) {
+  // loading UI
+  if (loading) {
     return (
         <div className="flex flex-col min-h-screen">
           <Navbar
@@ -130,6 +130,25 @@ const Trading = () => {
     );
   }
 
+  // error UI
+  if (error || !marketData) {
+    return (
+        <div className="flex flex-col min-h-screen">
+          <Navbar
+              isAuthenticated={isAuthenticated}
+              onLogin={handleLogin}
+              onSignup={handleSignup}
+              onLogout={handleLogout}
+          />
+          <main className="flex-1 bg-background flex items-center justify-center">
+            <p className="text-red-500">{error || "Unknown error"}</p>
+          </main>
+          <Footer />
+        </div>
+    );
+  }
+
+  // success: render the trading screen
   return (
       <div className="flex flex-col min-h-screen">
         <Navbar
@@ -163,9 +182,9 @@ const Trading = () => {
               </div>
             </div>
 
-            {/* Main */}
+            {/* Main grid */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              {/* Chart */}
+              {/* Chart / Depth / Trades */}
               <div className="lg:col-span-3 space-y-6">
                 <div className="bg-card border rounded-lg overflow-hidden">
                   <div className="border-b p-4 flex justify-between items-center">
@@ -185,10 +204,18 @@ const Trading = () => {
                         </TabsTrigger>
                       </TabsList>
                       <div className="flex items-center space-x-2">
-                        <Button variant="outline" size="sm">1h</Button>
-                        <Button variant="outline" size="sm">4h</Button>
-                        <Button variant="outline" size="sm" className="bg-secondary">1D</Button>
-                        <Button variant="outline" size="sm">1W</Button>
+                        <Button variant="outline" size="sm">
+                          1h
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          4h
+                        </Button>
+                        <Button variant="outline" size="sm" className="bg-secondary">
+                          1D
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          1W
+                        </Button>
                       </div>
                     </Tabs>
                   </div>
@@ -202,9 +229,10 @@ const Trading = () => {
                 </div>
               </div>
 
-              {/* Order form */}
+              {/* Order form sidebar */}
               <div className="space-y-6">
                 <OrderForm
+                    assetId={numericAssetId}
                     symbol={marketData.symbol}
                     currentPrice={marketData.price}
                     isAuthenticated={isAuthenticated}
