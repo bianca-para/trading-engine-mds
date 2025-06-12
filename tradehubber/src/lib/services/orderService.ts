@@ -36,7 +36,7 @@ export const orderService = {
 
   /** Get all orders for a given asset */
   async getOrdersByAsset(assetId: number | string): Promise<OrderResponse[]> {
-    const resp = await fetch(`${API_BASE_URL}/order/asset/${assetId}`, {
+    const resp = await fetch(`http://127.0.0.1:8000/orderbook/BTC`, {
       headers: { "Content-Type": "application/json" },
     });
     if (!resp.ok) {

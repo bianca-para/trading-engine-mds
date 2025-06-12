@@ -1,36 +1,46 @@
 version: '3.8'
-
 services:
-  # db
   postgre_db:
-    container_name: postgredb
     image: postgres:15
+    container_name: postgredb
     ports:
       - "2004:5432"
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER:     postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: TradingEngineDB
+      POSTGRES_DB:       TradingEngineDB
+    networks:
+      - backend
 
-  # spring server
-  spring_app:
-    build:
-      context: server
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgre_db:5432/TradingEngineDB
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: password
-    depends_on:
-      - postgre_db
-      - python_api
-
-  # python API
   python_api:
     build:
       context: matching-engine
       dockerfile: Dockerfile
+    container_name: python_api
     ports:
-      - "8000:8000"
+      - "8000:8000"       # <-- exposes 8000 on host
+    networks:
+      - backend
+
+  spring_app:
+    build:
+      context: server
+      dockerfile: Dockerfile
+    container_name: spring_app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL:      jdbc:postgresql://postgre_db:5432/TradingEngineDB
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      # point Spring at the Python service by its Compose service name
+      MATCHING_ENGINE_URL:        http://python_api:8000
+    depends_on:
+      - postgre_db
+      - python_api
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

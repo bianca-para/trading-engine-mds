@@ -1,11 +1,20 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from main import matchingEngine, order
 from datetime import datetime
-from fastapi import HTTPException
-
 
 app = FastAPI()
+
+# 1) Add CORS middleware **before** any routes
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8090"],  # your React app origin
+    allow_credentials=True,
+    allow_methods=["*"],    # GET, POST, DELETE, etc.
+    allow_headers=["*"],    # Authorization, Content-Type, etc.
+)
+
 engine_instance = matchingEngine()
 
 class OrderIn(BaseModel):
@@ -14,7 +23,7 @@ class OrderIn(BaseModel):
     symbol: str
     price: float
     quantity: int
-    side: str  # BUY sau SELL
+    side: str       # BUY or SELL
     timestamp: datetime
 
 class OrderCancel(BaseModel):
@@ -25,18 +34,18 @@ class OrderCancel(BaseModel):
 
 @app.delete("/order")
 def cancel_order(data: OrderCancel):
-    success = engine_instance.cancelOrder(data.symbol, data.id, data.traderId, data.side.upper())
+    success = engine_instance.cancelOrder(
+        data.symbol, data.id, data.traderId, data.side.upper()
+    )
     if not success:
         raise HTTPException(status_code=404, detail="Order not found or already matched")
     return {"status": "cancelled"}
 
 @app.post("/order")
 def receive_order(o: OrderIn):
-    # convertim in obiect order
     ord = order(**o.dict())
     trades = engine_instance.receiveOrder(ord)
     return {"trades": trades}
-
 
 @app.get("/orderbook/{symbol}")
 def get_orderbook(symbol: str):
@@ -44,15 +53,18 @@ def get_orderbook(symbol: str):
     if not book:
         return {"bids": [], "asks": []}
 
-    bids = [{
-        "price": -price,
-        "orders": [o.__dict__ for o in book.bidLevels[-price].orders]
-    } for price in book.bidList]
-
-    asks = [{
-        "price": price,
-        "orders": [o.__dict__ for o in book.askLevels[price].orders]
-    } for price in book.askList]
-
+    bids = [
+        {
+            "price": -price,
+            "orders": [o.__dict__ for o in book.bidLevels[-price].orders],
+        }
+        for price in book.bidList
+    ]
+    asks = [
+        {
+            "price": price,
+            "orders": [o.__dict__ for o in book.askLevels[price].orders],
+        }
+        for price in book.askList
+    ]
     return {"bids": bids, "asks": asks}
-
