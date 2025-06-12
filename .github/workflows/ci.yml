@@ -1,0 +1,48 @@
+name: CI flow
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Set-up JAVA
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Make Maven Wrapper executable
+        run: chmod +x server/mvnw
+
+      # Rulam testele Spring (unit+integrations) cu profilul application-test
+      - name: Run Java tests
+        working-directory: server
+        run: ./mvnw clean verify -Dspring.profiles.active=test
+
+      # Set-up Python
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install fastapi uvicorn       
+          pip install pytest                     
+
+      - name: Run Python tests
+        working-directory: matching-engine
+        run: |
+          python -m unittest discover -v
