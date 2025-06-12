@@ -1,4 +1,7 @@
-import { API_BASE_URL } from './config';
+// src/lib/services/tradeService.ts
+
+import axios from "axios";
+import { API_BASE_URL } from "./config";
 
 export interface TradeRequest {
   buyerId: string;
@@ -16,112 +19,69 @@ export interface TradeResponse {
   quantity: number;
   price: number;
   total: number;
-  status: 'PENDING' | 'COMPLETED' | 'CANCELLED';
+  status: "PENDING" | "COMPLETED" | "CANCELLED";
   executedAt: string;
 }
 
 export const tradeService = {
-  async createTrade(tradeRequest: TradeRequest): Promise<TradeResponse> {
-    const response = await fetch(`${API_BASE_URL}/api/trades`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: JSON.stringify(tradeRequest),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to create trade');
-    }
-
-    return response.json();
+  /** Create a new trade */
+  async createTrade(tr: TradeRequest): Promise<TradeResponse> {
+    const resp = await axios.post<TradeResponse>(
+        `${API_BASE_URL}/api/trades`,
+        tr
+    );
+    return resp.data;
   },
 
-  async getTradesByAsset(symbol: string): Promise<TradeResponse[]> {
-    const response = await fetch(`${API_BASE_URL}/api/trades/asset/${symbol}`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to get trades by asset');
-    }
-
-    return response.json();
+  /** Get all trades for a given asset ID */
+  async getTradesByAsset(assetId: number): Promise<TradeResponse[]> {
+    const resp = await axios.get<TradeResponse[]>(
+        `${API_BASE_URL}/api/trades/asset/${assetId}`
+    );
+    return resp.data;
   },
 
+  /** Get all trades where the current user was the buyer */
   async getTradesByBuyer(buyerId: string): Promise<TradeResponse[]> {
-    const response = await fetch(`${API_BASE_URL}/api/trades/buyer/${buyerId}`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to get trades by buyer');
-    }
-
-    return response.json();
+    const resp = await axios.get<TradeResponse[]>(
+        `${API_BASE_URL}/api/trades/buyer/${buyerId}`
+    );
+    return resp.data;
   },
 
+  /** Get all trades where the current user was the seller */
   async getTradesBySeller(sellerId: string): Promise<TradeResponse[]> {
-    const response = await fetch(`${API_BASE_URL}/api/trades/seller/${sellerId}`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to get trades by seller');
-    }
-
-    return response.json();
+    const resp = await axios.get<TradeResponse[]>(
+        `${API_BASE_URL}/api/trades/seller/${sellerId}`
+    );
+    return resp.data;
   },
 
-  async getTradesByDateRange(from: string, to: string): Promise<TradeResponse[]> {
-    const response = await fetch(`${API_BASE_URL}/api/trades/date-range`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: JSON.stringify({ from, to }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to get trades by date range');
-    }
-
-    return response.json();
+  /** Get trades between two dates */
+  async getTradesByDateRange(
+      from: string,
+      to: string
+  ): Promise<TradeResponse[]> {
+    const resp = await axios.post<TradeResponse[]>(
+        `${API_BASE_URL}/api/trades/date-range`,
+        { from, to }
+    );
+    return resp.data;
   },
 
+  /** Get all trades above a minimum price */
   async getTradesByMinPrice(minPrice: number): Promise<TradeResponse[]> {
-    const response = await fetch(`${API_BASE_URL}/api/trades/min-price/${minPrice}`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to get trades by min price');
-    }
-
-    return response.json();
+    const resp = await axios.get<TradeResponse[]>(
+        `${API_BASE_URL}/api/trades/min-price/${minPrice}`
+    );
+    return resp.data;
   },
 
+  /** Get all trades for the currently authenticated user */
   async getUserTrades(): Promise<TradeResponse[]> {
-    const response = await fetch(`${API_BASE_URL}/api/trades/user`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to get user trades');
-    }
-
-    return response.json();
+    const resp = await axios.get<TradeResponse[]>(
+        `${API_BASE_URL}/api/trades/user`
+    );
+    return resp.data;
   },
-}; 
+};

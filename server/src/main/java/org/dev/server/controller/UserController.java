@@ -37,12 +37,26 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<UserResponseLogin> login(@RequestBody UserRequestLoginDto request){
-        //Validate username/password with DB(required in case of Stateless Authentication)
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                request.getUsername(), request.getPassword()));
-        String token =util.generateToken(request.getUsername());
-        return ResponseEntity.ok(new UserResponseLogin(token, "Token generated successfully!"));
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+        );
+
+        // load the full user so you can get its id
+        UserResponseDto user = userService.findByUsername(request.getUsername());
+
+        String token = util.generateToken(user.username(), user.id());
+
+        // include id + username in the DTO if you want to echo them back
+        return ResponseEntity.ok(
+                new UserResponseLogin(
+                        token,
+                        "Token generated successfully!",
+                        user.id(),
+                        user.username()
+                )
+        );
     }
+
 
     @GetMapping("{id}")
     public ResponseEntity<UserResponseDto> getUserById(@PathVariable UUID id) {

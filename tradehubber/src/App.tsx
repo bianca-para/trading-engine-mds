@@ -22,7 +22,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/trading" element={<Trading />} />
-          <Route path="/trading/:symbol" element={<Trading />} />
+          <Route path="/trading/:assetId" element={<Trading />} />
           <Route path="/markets" element={<Markets />} />
           <Route path="/news" element={<News />} />
           <Route path="/portfolio" element={<Portfolio />} />

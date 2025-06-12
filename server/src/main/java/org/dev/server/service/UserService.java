@@ -10,5 +10,6 @@ public interface UserService {
 
     UserResponseDto getUserById(UUID id);
 
+    UserResponseDto findByUsername(String username);
 //    Optional<User> findByUsername(String username);
 }

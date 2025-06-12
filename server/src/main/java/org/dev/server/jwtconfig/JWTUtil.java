@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -21,14 +22,15 @@ public class JWTUtil {
     private String secret_key;
 
     // code to generate Token
-    public String generateToken(String subject) {
-        String tokenId= String.valueOf(new Random().nextInt(10000));
+    public String generateToken(String username, UUID userId) {
+        String tokenId = String.valueOf(new Random().nextInt(10000));
         return Jwts.builder()
                 .setId(tokenId)
-                .setSubject(subject)
+                .setSubject(username)
+                .claim("userId", userId.toString())      // ← custom claim!
                 .setIssuer("ABC_Ltd")
                 .setAudience("XYZ_Ltd")
-                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(1)))
                 .signWith(SignatureAlgorithm.HS512, Base64.getEncoder().encode(secret_key.getBytes()))
                 .compact();
