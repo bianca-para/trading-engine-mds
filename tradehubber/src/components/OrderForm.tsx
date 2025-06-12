@@ -12,7 +12,7 @@ import { OrderRequest } from "@/lib/services/orderService";
 interface OrderFormProps {
   assetId: number;
   symbol: string;
-  currentPrice: number;
+  currentPrice: number;              // still available if you want to show it somewhere
   isAuthenticated: boolean;
   onPlaceOrder: (orderData: OrderRequest) => Promise<void>;
   className?: string;
@@ -32,7 +32,6 @@ export default function OrderForm({
   const [total, setTotal] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  // Now each field only updates its own state:
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAmount(e.target.value);
   };
@@ -65,7 +64,8 @@ export default function OrderForm({
       });
       return;
     }
-    if (orderType === "limit" && (!price || parseFloat(price) <= 0)) {
+
+    if (!price || parseFloat(price) <= 0) {
       toast.error("Invalid price", {
         description: "Please enter a valid price.",
       });
@@ -79,15 +79,15 @@ export default function OrderForm({
         userId,
         assetId,
         quantity: parseFloat(amount),
-        price:
-            orderType === "market" ? currentPrice : parseFloat(price),
+        // ALWAYS use the user‐entered price:
+        price: parseFloat(price),
         type: side.toUpperCase() as "BUY" | "SELL",
         createdAt: now,
       };
 
       await onPlaceOrder(orderData);
 
-      // reset the form (but keep price at current market)
+      // reset fields, but keep the last price if you like:
       setAmount("");
       setPrice(currentPrice.toString());
       setTotal("");
@@ -166,38 +166,17 @@ export default function OrderForm({
               </div>
             </div>
 
-            {/* Limit Price */}
-            {orderType === "limit" && (
-                <div className="space-y-1.5">
-                  <label className="text-xs text-muted-foreground">
-                    Price (USD)
-                  </label>
-                  <div className="relative">
-                    <Input
-                        type="number"
-                        value={price}
-                        onChange={handlePriceChange}
-                        placeholder="Price per unit"
-                        className="pr-16"
-                    />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                      USD
-                    </div>
-                  </div>
-                </div>
-            )}
-
-            {/* Total */}
+            {/* PRICE (now always visible) */}
             <div className="space-y-1.5">
               <label className="text-xs text-muted-foreground">
-                Total (USD)
+                Price (USD)
               </label>
               <div className="relative">
                 <Input
                     type="number"
-                    value={total}
-                    onChange={handleTotalChange}
-                    placeholder="Total amount in USD"
+                    value={price}
+                    onChange={handlePriceChange}
+                    placeholder="Price per unit"
                     className="pr-16"
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
@@ -205,6 +184,8 @@ export default function OrderForm({
                 </div>
               </div>
             </div>
+
+
 
             <Button
                 onClick={() => handleSubmit("buy")}
@@ -240,38 +221,17 @@ export default function OrderForm({
               </div>
             </div>
 
-            {/* Limit Price */}
-            {orderType === "limit" && (
-                <div className="space-y-1.5">
-                  <label className="text-xs text-muted-foreground">
-                    Price (USD)
-                  </label>
-                  <div className="relative">
-                    <Input
-                        type="number"
-                        value={price}
-                        onChange={handlePriceChange}
-                        placeholder="Price per unit"
-                        className="pr-16"
-                    />
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                      USD
-                    </div>
-                  </div>
-                </div>
-            )}
-
-            {/* Total */}
+            {/* PRICE */}
             <div className="space-y-1.5">
               <label className="text-xs text-muted-foreground">
-                Total (USD)
+                Price (USD)
               </label>
               <div className="relative">
                 <Input
                     type="number"
-                    value={total}
-                    onChange={handleTotalChange}
-                    placeholder="Total amount in USD"
+                    value={price}
+                    onChange={handlePriceChange}
+                    placeholder="Price per unit"
                     className="pr-16"
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
@@ -279,6 +239,8 @@ export default function OrderForm({
                 </div>
               </div>
             </div>
+
+
 
             <Button
                 onClick={() => handleSubmit("sell")}
