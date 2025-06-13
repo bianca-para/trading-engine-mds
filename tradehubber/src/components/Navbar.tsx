@@ -75,14 +75,14 @@ const Navbar = ({
           <div className="flex items-center space-x-4">
             <Link to="/" className="flex items-center">
               <BarChart2 className="h-8 w-8 text-primary" />
-              <span className="ml-2 text-xl font-semibold">TradeHub</span>
+              <span className="ml-2 text-xl font-semibold">TradeNow</span>
             </Link>
             
             <div className="hidden md:block">
               <div className="flex items-center space-x-1">
                 <NavLink to="/" label="Home" />
                 <NavLink to="/markets" label="Markets" />
-                <NavLink to="/trading" label="Trading" />
+         
                 <NavLink to="/news" label="News" />
                 {isAuthenticated && <NavLink to="/portfolio" label="Portfolio" />}
               </div>

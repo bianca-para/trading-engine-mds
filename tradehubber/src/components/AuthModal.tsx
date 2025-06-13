@@ -121,10 +121,10 @@ const AuthModal = ({
             <TabsContent value="login">
               <form onSubmit={handleLogin} className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <Label htmlFor="login-username">Username</Label>
+                  <Label htmlFor="login-username">Email</Label>
                   <Input
                       id="login-username"
-                      placeholder="your username"
+                      placeholder="your email"
                       type="text"
                       value={loginUsername}
                       onChange={(e) => setLoginUsername(e.target.value)}
@@ -138,6 +138,7 @@ const AuthModal = ({
                   <div className="relative">
                     <Input
                         id="login-password"
+                        placeholder="your password"
                         type={showPassword ? "text" : "password"}
                         value={loginPassword}
                         onChange={(e) => setLoginPassword(e.target.value)}

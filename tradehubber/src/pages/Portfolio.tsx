@@ -132,7 +132,7 @@ const Portfolio = () => {
         />
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-2xl mx-auto text-center">
-            <h1 className="text-4xl font-bold mb-4">Welcome to TradeHubber</h1>
+            <h1 className="text-4xl font-bold mb-4">Welcome to TradeNow</h1>
             <p className="text-muted-foreground mb-8">
               Please log in or create an account to view your portfolio.
             </p>

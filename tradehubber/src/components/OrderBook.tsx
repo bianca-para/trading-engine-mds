@@ -1,19 +1,19 @@
-// src/components/OrderBook.tsx
-
 import { useState, useEffect } from "react";
 import { API_BASE_URL } from "@/lib/services/config";
 
+interface Order {
+  id: number;
+  traderId: string;
+  symbol: string;
+  price: number;
+  quantity: number;
+  side: string;
+  timestamp: string;
+}
+
 interface Level {
   price: number;
-  orders: Array<{
-    id: number;
-    traderId: string;
-    symbol: string;
-    price: number;
-    quantity: number;
-    side: string;
-    timestamp: string;
-  }>;
+  orders: Order[];
 }
 
 interface OrderBookResponse {
@@ -33,7 +33,6 @@ export default function OrderBook({ symbol }: OrderBookProps) {
   useEffect(() => {
     const fetchBook = async () => {
       try {
-        console.log(symbol)
         const res = await fetch(`http://127.0.0.1:8000/orderbook/${encodeURIComponent(symbol)}`, {
           headers: { "Content-Type": "application/json" },
         });
@@ -51,7 +50,7 @@ export default function OrderBook({ symbol }: OrderBookProps) {
     };
 
     fetchBook();
-    const id = setInterval(fetchBook, 5_000);
+    const id = setInterval(fetchBook, 5000);
     return () => clearInterval(id);
   }, [symbol]);
 
@@ -60,32 +59,39 @@ export default function OrderBook({ symbol }: OrderBookProps) {
   }
 
   return (
-      <div className="bg-card border rounded-lg p-4">
-        <h3 className="text-xl font-semibold mb-4">Order Book: {symbol}</h3>
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            <h4 className="text-lg font-medium mb-2 text-trade-buy">Bids</h4>
-            <ul className="space-y-1">
-              {bids.map((lvl) => (
-                  <li key={lvl.price} className="flex justify-between">
-                    <span>${lvl.price.toFixed(2)}</span>
-                    <span>{lvl.orders.length} order{lvl.orders.length !== 1 && "s"}</span>
-                  </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-lg font-medium mb-2 text-trade-sell">Asks</h4>
-            <ul className="space-y-1">
-              {asks.map((lvl) => (
-                  <li key={lvl.price} className="flex justify-between">
-                    <span>${lvl.price.toFixed(2)}</span>
-                    <span>{lvl.orders.length} order{lvl.orders.length !== 1 && "s"}</span>
-                  </li>
-              ))}
-            </ul>
-          </div>
+    <div className="bg-card border rounded-lg p-4">
+      <h3 className="text-xl font-semibold mb-4">Order Book: {symbol}</h3>
+      <div className="grid grid-cols-2 gap-6">
+        {/* Bids */}
+        <div>
+          <h4 className="text-lg font-medium mb-2 text-trade-buy">Bids</h4>
+          <ul className="space-y-1">
+            {bids.flatMap((lvl) =>
+              lvl.orders.map((o) => (
+                <li key={o.id} className="flex justify-between text-green-600">
+                  <span>${o.price.toFixed(2)}</span>
+                  <span>{o.quantity} {symbol}</span>
+                </li>
+              ))
+            )}
+          </ul>
+        </div>
+
+        {/* Asks */}
+        <div>
+          <h4 className="text-lg font-medium mb-2 text-trade-sell">Asks</h4>
+          <ul className="space-y-1">
+            {asks.flatMap((lvl) =>
+              lvl.orders.map((o) => (
+                <li key={o.id} className="flex justify-between text-red-600">
+                  <span>${o.price.toFixed(2)}</span>
+                  <span>{o.quantity} {symbol}</span>
+                </li>
+              ))
+            )}
+          </ul>
         </div>
       </div>
+    </div>
   );
 }

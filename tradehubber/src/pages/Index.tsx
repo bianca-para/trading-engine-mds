@@ -64,7 +64,7 @@ const Index = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
               <div className="space-y-6 animate-fade-in">
                 <div className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-sm font-semibold transition-colors">
-                  <span className="text-muted-foreground">Introducing TradeHub Platform</span>
+                  <span className="text-muted-foreground">Introducing TradeNow Platform</span>
                 </div>
                 <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
                   Modern Trading Platform for Smart Investors
@@ -106,7 +106,7 @@ const Index = () => {
         <section className="py-16 md:py-24">
           <div className="container px-4 md:px-6">
             <div className="text-center max-w-3xl mx-auto mb-12">
-              <h2 className="text-3xl font-bold tracking-tight">Why Choose TradeHub</h2>
+              <h2 className="text-3xl font-bold tracking-tight">Why Choose TradeNow</h2>
               <p className="mt-4 text-lg text-muted-foreground">
                 Designed for both beginners and professional traders with powerful features
               </p>
@@ -210,7 +210,7 @@ const Index = () => {
                   Ready to start trading?
                 </h2>
                 <p className="text-lg md:text-xl text-primary-foreground/80 mb-8">
-                  Join thousands of traders who trust TradeHub for their investment needs. Get started in minutes.
+                  Join thousands of traders who trust TradeNow for their investment needs. Get started in minutes.
                 </p>
                 <Button
                   size="lg"

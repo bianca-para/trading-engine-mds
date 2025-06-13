@@ -15,7 +15,7 @@ const Footer = ({ className }: FooterProps) => {
           <div className="md:col-span-1">
             <Link to="/" className="flex items-center">
               <BarChart2 className="h-8 w-8 text-primary" />
-              <span className="ml-2 text-xl font-semibold">TradeHub</span>
+              <span className="ml-2 text-xl font-semibold">TradeNow</span>
             </Link>
             <p className="mt-3 text-sm text-muted-foreground">
               Professional trading platform with real-time market data and advanced trading tools.
@@ -128,7 +128,7 @@ const Footer = ({ className }: FooterProps) => {
         
         <div className="mt-12 pt-8 border-t text-center sm:flex sm:justify-between sm:text-left">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} TradeHub. All rights reserved.
+            &copy; {new Date().getFullYear()} TradeNow. All rights reserved.
           </p>
           <div className="mt-4 sm:mt-0 flex flex-wrap justify-center sm:justify-end gap-4">
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
